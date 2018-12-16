@@ -9,9 +9,11 @@ var VistaAdministrador = function(modelo, controlador, elementos) {
 
   // suscripción de observadores
   this.modelo.preguntaAgregada.suscribir(function() {
+    console.log("notificacionRecibida");
     contexto.reconstruirLista();
   });
 };
+
 
 
 VistaAdministrador.prototype = {
@@ -25,6 +27,7 @@ VistaAdministrador.prototype = {
     var contexto = this;
     var nuevoItem;
     //completar
+    nuevoItem = $('<li id="' + pregunta.id +'" class="list-group-item">' + pregunta.textoPregunta + '</li>');
     //asignar a nuevoitem un elemento li con clase "list-group-item", id "pregunta.id" y texto "pregunta.textoPregunta"
     var interiorItem = $('.d-flex');
     var titulo = interiorItem.find('h5');
