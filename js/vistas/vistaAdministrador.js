@@ -21,6 +21,8 @@ VistaAdministrador.prototype = {
   inicializar: function() {
     //llamar a los metodos para reconstruir la lista, configurar botones y validar formularios
     validacionDeFormulario();
+    this.reconstruirLista();
+    this.configuracionDeBotones();
   },
 
   construirElementoPregunta: function(pregunta){
@@ -58,7 +60,10 @@ VistaAdministrador.prototype = {
       var respuestas = [];
 
       $('[name="option[]"]').each(function() {
-        //completar
+        const contenidoRespuesta = $(this).val();
+        if (contenidoRespuesta != false) {
+          respuestas.push(contenidoRespuesta)
+        }
       })
       contexto.limpiarFormulario();
       contexto.controlador.agregarPregunta(value, respuestas);
@@ -70,3 +75,4 @@ VistaAdministrador.prototype = {
     $('.form-group.answer.has-feedback.has-success').remove();
   },
 };
+
