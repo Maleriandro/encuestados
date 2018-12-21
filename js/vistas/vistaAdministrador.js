@@ -9,7 +9,10 @@ var VistaAdministrador = function(modelo, controlador, elementos) {
 
   // suscripción de observadores
   this.modelo.preguntaAgregada.suscribir(function() {
-    console.log("notificacionRecibida");
+    contexto.reconstruirLista();
+  });
+
+  this.modelo.preguntaEliminada.suscribir(function() {
     contexto.reconstruirLista();
   });
 };
@@ -59,15 +62,23 @@ VistaAdministrador.prototype = {
       var value = e.pregunta.val();
       var respuestas = [];
 
+
       $('[name="option[]"]').each(function() {
         const contenidoRespuesta = $(this).val();
         if (contenidoRespuesta != false) {
           respuestas.push(contenidoRespuesta)
         }
       })
+
       contexto.limpiarFormulario();
       contexto.controlador.agregarPregunta(value, respuestas);
     });
+
+    e.botonBorrarPregunta.click(function() {
+      var id = parseInt($('.list-group-item.active').attr('id'));
+
+      contexto.controlador.borrarPregunta(id);
+    })
     //asociar el resto de los botones a eventos
   },
 
