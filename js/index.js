@@ -1,4 +1,5 @@
 var modelo = new Modelo();
+modelo.inicializar();
 var vistaAdmin = new VistaAdministrador(modelo, new Controlador(modelo), {
   'lista': $('#lista'),
   'botonEditarPregunta': $('#editarPregunta'),

@@ -7,9 +7,32 @@ var VistaUsuario = function(modelo, controlador, elementos) {
   this.elementos = elementos;
   var contexto = this;
 
-  //suscripcion a eventos del modelo
+
   this.modelo.preguntaAgregada.suscribir(function() {
     contexto.reconstruirLista();
+  });
+
+  this.modelo.preguntaEliminada.suscribir(function() {
+    contexto.reconstruirLista();
+    contexto.reconstruirGrafico();
+  });
+
+  this.modelo.respuestaAgregada.suscribir(function() {
+    contexto.reconstruirLista();
+  });
+
+  this.modelo.preguntaEditada.suscribir(function() {
+    contexto.reconstruirLista();
+    contexto.reconstruirGrafico();
+  });
+
+  this.modelo.preguntasEliminadas.suscribir(function() {
+    contexto.reconstruirLista();
+    contexto.reconstruirGrafico();
+  });
+
+  this.modelo.votoAgregado.suscribir(function() {
+    contexto.reconstruirGrafico();
   });
 };
 
@@ -49,8 +72,10 @@ VistaUsuario.prototype = {
     var contexto = this;
     var preguntas = this.modelo.preguntas;
     preguntas.forEach(function(clave){
-      //completar
-      //agregar a listaPreguntas un elemento div con valor "clave.textoPregunta", texto "clave.textoPregunta", id "clave.id"
+      
+      var div = $(`<div value="${clave.textoPregunta}" id="${clave.id}">${clave.textoPregunta}</div>`);
+      $(listaPreguntas).append(div);      
+
       var respuestas = clave.cantidadPorRespuesta;
       contexto.mostrarRespuestas(listaPreguntas,respuestas, clave);
     })
@@ -73,7 +98,7 @@ VistaUsuario.prototype = {
 
   agregarVotos: function(){
     var contexto = this;
-    $('#preguntas').find('div').each(function(){
+    $('#preguntas').find('div').each(function() {
         var nombrePregunta = $(this).attr('value');
         var id = $(this).attr('id');
         var respuestaSeleccionada = $('input[name=' + id + ']:checked').val();
@@ -82,7 +107,7 @@ VistaUsuario.prototype = {
       });
   },
 
-  dibujarGrafico: function(nombre, respuestas){
+  dibujarGrafico: function(nombre, respuestas) {
     var seVotoAlgunaVez = false;
     for(var i=1;i<respuestas.length;++i){
       if(respuestas[i][1]>0){

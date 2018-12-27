@@ -19,7 +19,16 @@ var VistaAdministrador = function(modelo, controlador, elementos) {
   this.modelo.respuestaAgregada.suscribir(function() {
     contexto.reconstruirLista();
   });
+  
+  this.modelo.preguntaEditada.suscribir(function() {
+    contexto.reconstruirLista();
+  });
+  
+  this.modelo.preguntasEliminadas.suscribir(function() {
+    contexto.vaciarLista();
+  });
 };
+
 
 
 
@@ -46,6 +55,11 @@ VistaAdministrador.prototype = {
     }));
     nuevoItem.html($('.d-flex').html());
     return nuevoItem;
+  },
+
+  vaciarLista: function() {
+    var lista = this.elementos.lista;
+    lista.html('');
   },
 
   reconstruirLista: function() {
@@ -78,11 +92,28 @@ VistaAdministrador.prototype = {
       contexto.controlador.agregarPregunta(value, respuestas);
     });
 
+
+    e.botonEditarPregunta.click(function() {
+      var id = parseInt($('.list-group-item.active').attr('id'));
+
+      var nuevaPregunta = prompt('¿Cuál queres que sea la nueva pregunta?');
+
+      contexto.controlador.editarPregunta(id, nuevaPregunta);
+    });
+
+
     e.botonBorrarPregunta.click(function() {
       var id = parseInt($('.list-group-item.active').attr('id'));
 
       contexto.controlador.borrarPregunta(id);
-    })
+    });
+
+
+    e.borrarTodo.click(function() {
+      contexto.controlador.borrarTodo();
+    });
+
+    
     //asociar el resto de los botones a eventos
   },
 

@@ -11,9 +11,16 @@ var Modelo = function() {
   this.respuestaAgregada = new Evento(this);
   this.preguntaEditada = new Evento(this);
   this.preguntasEliminadas = new Evento(this);
+  this.votoAgregado = new Evento(this);
 };
 
+
 Modelo.prototype = {
+  inicializar: function() {
+    this.cargarLocalStorage();
+  },
+
+
   //se obtiene el id más grande asignado a una pregunta
   obtenerUltimoId: function() {
     var ultimaId = 0;
@@ -29,7 +36,7 @@ Modelo.prototype = {
   },
 
   //se agrega una pregunta dado un nombre y sus respuestas
-  buscarPregunta: function(id) {
+  buscarPreguntaPorId: function(id) {
     const indexDePregunta = this.preguntas.findIndex(pregunta => {
       return (id == pregunta.id);
     });
@@ -37,6 +44,24 @@ Modelo.prototype = {
     return indexDePregunta;
   },
 
+
+  buscarPreguntaPorTexto: function(texto) {
+    const indexDePregunta = this.preguntas.findIndex(pregunta => {
+      return (texto == pregunta.textoPregunta);
+    });
+
+    return indexDePregunta;
+  },
+
+
+  buscarRespuestaPorTexto: function(indexPregunta, texto) {
+    const indexDeRespuesta = this.preguntas[indexPregunta].cantidadPorRespuesta.findIndex(respuesta => {
+      return (texto == respuesta.textoRespuesta);
+    });
+
+    return indexDeRespuesta;
+  },
+  
 
   agregarPregunta: function(nombre, respuestas) {
     var id = this.obtenerUltimoId();
@@ -56,42 +81,53 @@ Modelo.prototype = {
     
 
     this.preguntas.push(nuevaPregunta);
-    this.guardar();
+
+    this.actualizarLocalStorage();
     this.preguntaAgregada.notificar();
   },
 
 
   borrarPregunta: function(idPregunta) {
-  var eliminarIndex = this.buscarPregunta(idPregunta);
+  var eliminarIndex = this.buscarPreguntaPorId(idPregunta);
 
     this.preguntas.splice(eliminarIndex, 1);
+
+    this.actualizarLocalStorage();
     this.preguntaEliminada.notificar();
   },
 
 
   agregarRespuesta: function(respuesta, idPregunta) {
-    const indexDePregunta = this.buscarPregunta(idPregunta);
+    debugger;
+    const indexDePregunta = this.buscarPreguntaPorId(idPregunta);
 
     const objetoRespuesta = {'textoRespuesta': respuesta, 'cantidad': 0};
 
     this.preguntas[indexDePregunta].cantidadPorRespuesta.push(objetoRespuesta);
 
+    this.actualizarLocalStorage();
     this.respuestaAgregada.notificar();
   },
 
   
-  sumarUnoVotoARespuesta: function(idPregunta, respuesta) {
-    const indexDePregunta = this.buscarPregunta(idPregunta);
+  agregarVoto: function(idPregunta, respuesta) {
+    const indexDePregunta = this.buscarPreguntaPorTexto(idPregunta);
 
-    //COMPLETAR 
+    var indexDeRespuesta = this.buscarRespuestaPorTexto(indexDePregunta, respuesta);
+
+    this.preguntas[indexDePregunta].cantidadPorRespuesta[indexDeRespuesta].cantidad += 1;
+
+    this.actualizarLocalStorage();
+    this.votoAgregado.notificar();
   },
 
 
   editarPregunta: function(idPregunta, edicionPregunta) {
-    const indexDePregunta = this.buscarPregunta(idPregunta);
+    const indexDePregunta = this.buscarPreguntaPorId(idPregunta);
 
     this.preguntas[indexDePregunta].textoPregunta = edicionPregunta;
 
+    this.actualizarLocalStorage();
     this.preguntaEditada.notificar();
   },
 
@@ -99,12 +135,32 @@ Modelo.prototype = {
   borrarTodasPreguntas: function() {
     this.preguntas = [];
 
+    this.actualizarLocalStorage();
     this.preguntasEliminadas.notificar();
   },
 
-
+  
   //se guardan las preguntas
-  guardar: function(){
+  actualizarLocalStorage: function() {
+    const JSONpreguntas = JSON.stringify(this.preguntas);
 
+    localStorage.setItem('preguntas', JSONpreguntas);
   },
+
+
+  cargarLocalStorage: function() {
+    const preguntasLocalStorage = localStorage.getItem('preguntas');
+    
+    console.log(preguntasLocalStorage);
+    if (preguntasLocalStorage !== null && preguntasLocalStorage.length !== 0) {
+      const preguntasJSON = JSON.parse(preguntasLocalStorage);
+      
+      if (Array.isArray(preguntasJSON)) {
+        this.preguntas = preguntasJSON;
+        this.preguntaAgregada.notificar();
+      }
+    }
+  }
+
+  //COMPLETAR ELIMINAR, EDITAR Y AGARRAR PREGUNTAS
 };
